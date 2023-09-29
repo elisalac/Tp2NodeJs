@@ -1,6 +1,5 @@
 export default class Controller {
     constructor(HttpContext, repository = null) {
-        createserver
         this.HttpContext = HttpContext;
         this.repository = repository;
     }
