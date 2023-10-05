@@ -1,4 +1,6 @@
 import Controller from './Controller.js';
+import fs from 'fs';
+import path from 'path';
 
 export default class MathsController extends Controller {
     constructor(HttpContext) {
@@ -45,10 +47,6 @@ export default class MathsController extends Controller {
 
         switch (op) {
             case "+":
-                value = x + y;
-                message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ", 'value':" + value + "}";
-                this.HttpContext.response.JSON(message);
-                break;
             case " ":
                 value = x + y;
                 message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ", 'value':" + value + "}";
@@ -86,10 +84,10 @@ export default class MathsController extends Controller {
                 break;
             case "np":
                 value = getPrimeNumberAtPos(n);
-                essage = "{'op':" + op + ",'n':" + n + ", 'value':" + value + "}";
+                message = "{'op':" + op + ",'n':" + n + ", 'value':" + value + "}";
                 this.HttpContext.response.JSON(message);
                 break;
-            default:
+            /*default:
                 error = this.HttpContext.response.unprocessable("this operator does not exist");
                 if (!isNaN(y) && !isNaN(x) && isNaN(n)) {
                     message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'error':" + error + "}";
@@ -97,7 +95,7 @@ export default class MathsController extends Controller {
                     message = "{'op':" + op + ",'n':" + n + ", 'error':" + error + "}";
                 }
                 this.HttpContext.response.JSON(message);
-                break;
+                break;*/
         }
 
 
@@ -124,6 +122,18 @@ export default class MathsController extends Controller {
             this.HttpContext.response.JSON(message);
         }*/
     }
+
+    /*help() {
+        let helpPagePath = path.join(process.cwd(), wwwroot, "API-Help-Pages/API-Maths-Help.html");
+        this.HttpContext.response.HTML(fs.readFileSync(helpPagePath));
+    }
+
+    get() {
+        if (this.HttpContext.path.queryString == '?')
+            this.help();
+        else
+            this.doOperation();
+    }*/
 }
 
 function isPrime(n) {
@@ -135,31 +145,19 @@ function isPrime(n) {
 }
 
 function getPrimeNumberAtPos(n) {
-    var primeArray = [];
-    var count = 0;
-
-    for (var j = 1; j <= n; j++) {
-        for (var i = 1; i <= j; i++) {
-            if (j % i == 0) {
-                count++;
-            }
+    let primeNumer = 0;
+    for (let i = 0; i < n; i++) {
+        primeNumer++;
+        while (!isPrime(primeNumer)) {
+            primeNumer++;
         }
-        if (j == 1) {
-            primeArray.push(j);
-        }
-        if (count == 2) {
-            primeArray.push(j);
-        }
-        count = 0;
     }
-    return primeArray[n];
+    return primeNumer;
 }
 
 function factorializeNumber(n) {
-    if (n === 0 || n === 1)
+    if (n === 0 || n === 1) {
         return 1;
-    for (var i = n - 1; i >= 1; i--) {
-        n *= i;
     }
-    return n;
+    return n * factorial(n - 1);
 }
