@@ -8,7 +8,7 @@ export default class MathsController extends Controller {
     }
 
     get(id) {
-        let message;
+        /*let message;
         let value;
         let error;
         let data = this.HttpContext.path.params;
@@ -16,22 +16,34 @@ export default class MathsController extends Controller {
         let x = parseFloat(data.x);
         let y = parseFloat(data.y);
         let n = parseFloat(data.n);
-
-        /*if (isNaN(x) && !isNaN(y)) {
-            error = this.HttpContext.response.unprocessable("'x' parameter is not a number");
-            message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'error':" + error + "}";
-            this.HttpContext.response.JSON(message);
-        } else if (!isNaN(x) && isNaN(y)) {
-            error = this.HttpContext.response.unprocessable("'y' parameter is not a number");
-            message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'error':" + error + "}";
-            this.HttpContext.response.JSON(message);
-        } else if (isNaN(n)) {
-            error = this.HttpContext.response.unprocessable("'n' parameter is not a number");
-            message = "{'op':" + op + ",'n':" + n + ", 'error':" + error + "}";
-            this.HttpContext.response.JSON(message);
+        
+        if (isNaN(x) && isNaN(y) && isNaN(n) && op == undefined) {
+            this.HttpContext.response.HTML('<p><h1>GET : Maths endpoint</h1></p>' +
+                '<p><h1>List of possible query strings:</h1></p><hr>' +
+                '<p><h3>? op = + & x = number & y = number</p><p>return {"op":"+", "x":number, "y":numvber, "value": x + y}</h3></p>' +
+                '<p><h3>? op = - & x = number & y = number</p><p>return {"op":"-", "x":number, "y":numvber, "value": x - y}</h3></p>' +
+                '<p><h3>? op = * & x = number & y = number</p><p>return {"op":"*", "x":number, "y":numvber, "value": x * y}</h3></p>' +
+                '<p><h3>? op = / & x = number & y = number</p><p>return {"op":"/", "x":number, "y":numvber, "value": x / y}</h3></p>' +
+                '<p><h3>? op = % & x = number & y = number</p><p>return {"op":"%", "x":number, "y":numvber, "value": x % y}</h3></p>' +
+                '<p><h3>? op = ! & n = integer</p><p>return {"op":"%", "n":integer, "value": n!}</h3></p>' +
+                '<p><h3>? op = p & n = integer</p><p>return {"op":"p", "n":integer, "value": true if n is a prime number}</h3></p>' +
+                '<p><h3>? op = np & n = integer</p><p>return {"op":"np", "n":integer, "value": nth prime number}</h3></p>'
+            );
         }*/
 
-        if (isNaN(x) && isNaN(y) && isNaN(n) && op == undefined) {
+        let data = this.HttpContext.path.params;
+        if (!this.HttpContext.path.queryString.includes("n")) {
+            data.x = parseFloat(data.x);
+            data.y = parseFloat(data.y);
+        } else if (!this.HttpContext.path.queryString.includes("x") && !this.HttpContext.path.queryString.includes("y")) {
+            data.n = parseFloat(data.n);
+        }
+
+
+        if (data.op == " ")
+            data.op = "+";
+
+        if (this.HttpContext.path.queryString == "?") {
             this.HttpContext.response.HTML('<p><h1>GET : Maths endpoint</h1></p>' +
                 '<p><h1>List of possible query strings:</h1></p><hr>' +
                 '<p><h3>? op = + & x = number & y = number</p><p>return {"op":"+", "x":number, "y":numvber, "value": x + y}</h3></p>' +
@@ -45,49 +57,74 @@ export default class MathsController extends Controller {
             );
         }
 
-        switch (op) {
-            case "+":
-            case " ":
-                value = x + y;
-                message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ", 'value':" + value + "}";
-                this.HttpContext.response.JSON(message);
-                break;
-            case "-":
-                value = x - y;
-                message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ", 'value':" + value + "}";
-                this.HttpContext.response.JSON(message);
-                break;
-            case "*":
-                value = x * y;
-                message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'value':" + value + "}";
-                this.HttpContext.response.JSON(message);
-                break;
-            case "/":
-                value = x / y;
-                message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'value':" + value + "}";
-                this.HttpContext.response.JSON(message);
-                break;
-            case "%":
-                value = x % y;
-                message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'value':" + value + "}";
-                this.HttpContext.response.JSON(message);
-                break;
-            case "!":
-                value = factorializeNumber(n);
-                message = "{'op':" + op + ",'n':" + n + ", 'value':" + value + "}";
-                this.HttpContext.response.JSON(message);
-                break;
-            case "p":
-                value = isPrime(n);
-                message = "{'op':" + op + ",'n':" + n + ", 'value':" + value + "}";
-                this.HttpContext.response.JSON(message);
-                break;
-            case "np":
-                value = getPrimeNumberAtPos(n);
-                message = "{'op':" + op + ",'n':" + n + ", 'value':" + value + "}";
-                this.HttpContext.response.JSON(message);
-                break;
-            /*default:
+        if (this.HttpContext.path.queryString.includes("x") && this.HttpContext.path.queryString.includes("y")) {
+            switch (data.op) {
+                case "+":
+                case " ":
+                    data.value = data.x + data.y;
+                    this.HttpContext.response.JSON(data);
+                    break;
+                case "-":
+                    data.value = data.x - data.y;
+                    this.HttpContext.response.JSON(data);
+                    break;
+                case "*":
+                    data.value = data.x * data.y;
+                    this.HttpContext.response.JSON(data);
+                    break;
+                case "/":
+                    if (data.y != 0)
+                        data.value = data.x / data.y;
+                    else
+                        data.error = Infinity.toString();
+                    this.HttpContext.response.JSON(data);
+                    break;
+                case "%":
+                    if (data.x != 0 && data.y != 0)
+                        data.value = data.x % data.y;
+                    else
+                        data.error = "NaN"
+                    this.HttpContext.response.JSON(data);
+                    break;
+            }
+        } else if (this.HttpContext.path.queryString.includes("n")) {
+            if (data.n == 0) {
+                data.error = "'n' parameter must be an integer > 0";
+                this.HttpContext.response.JSON(data);
+            } else {
+                switch (data.op) {
+                    case "!":
+                        data.value = factorializeNumber(data.n);
+                        this.HttpContext.response.JSON(data);
+                        break;
+                    case "p":
+                        if (!Number.isInteger(data.n))
+                            data.error = "'n' parameter is not an integer";
+                        else
+                            data.value = isPrime(data.n);
+                        this.HttpContext.response.JSON(data);
+                        break;
+                    case "np":
+                        data.value = getPrimeNumberAtPos(data.n);
+                        this.HttpContext.response.JSON(data);
+                        break;
+                }
+            }
+        } else {
+            if (!this.HttpContext.path.queryString.includes("x")) {
+                data.error = "'x' parameter is missing";
+                return this.HttpContext.response.JSON(data);
+            } else if (!this.HttpContext.path.queryString.includes("y")) {
+                data.error = "'y' parameter is missing";
+                return this.HttpContext.response.JSON(data);
+            } /*else if (!this.HttpContext.path.queryString.includes("x") && !this.HttpContext.path.queryString.includes("y") && !this.HttpContext.path.queryString.includes("n")) {
+                data.error = "this parameter does not exists";
+                return this.HttpContext.path.response.JSON(data);
+            }*/
+
+        }
+        /*switch (data.op) {
+            default:
                 error = this.HttpContext.response.unprocessable("this operator does not exist");
                 if (!isNaN(y) && !isNaN(x) && isNaN(n)) {
                     message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'error':" + error + "}";
@@ -95,31 +132,7 @@ export default class MathsController extends Controller {
                     message = "{'op':" + op + ",'n':" + n + ", 'error':" + error + "}";
                 }
                 this.HttpContext.response.JSON(message);
-                break;*/
-        }
-
-
-        /*else {
-            if (!isNaN(y) && !isNaN(x)) {
-                let message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'error': this operation does not exist}";
-                this.HttpContext.response.JSON(message);
-            }
-            if (!isNaN(n)) {
-                let message = "{'op':" + op + ",'n':" + n + ", 'error': this operation does not exist}";
-                this.HttpContext.response.JSON(message);
-            }
-        }
-        if (isNaN(y)) {
-            let message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'error': 'y' is not a parameter}";
-            this.HttpContext.response.JSON(message);
-        }
-        if (isNaN(x)) {
-            let message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'error': 'x' is not a parameter}";
-            this.HttpContext.response.JSON(message);
-        }
-        if (!isNaN(n) && !isNaN(y) && !isNaN(x)) {
-            let message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ", 'n':" + n + ",'error': there are too many parameters}";
-            this.HttpContext.response.JSON(message);
+                break;
         }*/
     }
 
@@ -159,5 +172,5 @@ function factorializeNumber(n) {
     if (n === 0 || n === 1) {
         return 1;
     }
-    return n * factorial(n - 1);
+    return n * factorializeNumber(n - 1);
 }
