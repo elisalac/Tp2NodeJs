@@ -8,33 +8,12 @@ export default class MathsController extends Controller {
     }
 
     get(id) {
-        /*let message;
-        let value;
-        let error;
-        let data = this.HttpContext.path.params;
-        let op = data.op;
-        let x = parseFloat(data.x);
-        let y = parseFloat(data.y);
-        let n = parseFloat(data.n);
-        
-        if (isNaN(x) && isNaN(y) && isNaN(n) && op == undefined) {
-            this.HttpContext.response.HTML('<p><h1>GET : Maths endpoint</h1></p>' +
-                '<p><h1>List of possible query strings:</h1></p><hr>' +
-                '<p><h3>? op = + & x = number & y = number</p><p>return {"op":"+", "x":number, "y":numvber, "value": x + y}</h3></p>' +
-                '<p><h3>? op = - & x = number & y = number</p><p>return {"op":"-", "x":number, "y":numvber, "value": x - y}</h3></p>' +
-                '<p><h3>? op = * & x = number & y = number</p><p>return {"op":"*", "x":number, "y":numvber, "value": x * y}</h3></p>' +
-                '<p><h3>? op = / & x = number & y = number</p><p>return {"op":"/", "x":number, "y":numvber, "value": x / y}</h3></p>' +
-                '<p><h3>? op = % & x = number & y = number</p><p>return {"op":"%", "x":number, "y":numvber, "value": x % y}</h3></p>' +
-                '<p><h3>? op = ! & n = integer</p><p>return {"op":"%", "n":integer, "value": n!}</h3></p>' +
-                '<p><h3>? op = p & n = integer</p><p>return {"op":"p", "n":integer, "value": true if n is a prime number}</h3></p>' +
-                '<p><h3>? op = np & n = integer</p><p>return {"op":"np", "n":integer, "value": nth prime number}</h3></p>'
-            );
-        }*/
-
         let data = this.HttpContext.path.params;
         if (!this.HttpContext.path.queryString.includes("n")) {
-            data.x = parseFloat(data.x);
-            data.y = parseFloat(data.y);
+            if (this.HttpContext.path.queryString.includes("x"))
+                data.x = parseFloat(data.x);
+            if (this.HttpContext.path.queryString.includes("y"))
+                data.y = parseFloat(data.y);
         } else if (!this.HttpContext.path.queryString.includes("x") && !this.HttpContext.path.queryString.includes("y")) {
             data.n = parseFloat(data.n);
         }
@@ -58,6 +37,10 @@ export default class MathsController extends Controller {
         }
 
         if (this.HttpContext.path.queryString.includes("x") && this.HttpContext.path.queryString.includes("y")) {
+            if (Object.keys(data).length > 3) {
+                data.error = "too many parameters";
+                return this.HttpContext.response.JSON(data);
+            }
             switch (data.op) {
                 case "+":
                 case " ":
@@ -73,10 +56,12 @@ export default class MathsController extends Controller {
                     this.HttpContext.response.JSON(data);
                     break;
                 case "/":
-                    if (data.y != 0)
-                        data.value = data.x / data.y;
-                    else
+                    if (data.x == 0 && data.y == 0)
+                        data.error = "NaN";
+                    else if (data.y == 0)
                         data.error = Infinity.toString();
+                    else
+                        data.value = data.x / data.y;
                     this.HttpContext.response.JSON(data);
                     break;
                 case "%":
@@ -88,12 +73,16 @@ export default class MathsController extends Controller {
                     break;
             }
         } else if (this.HttpContext.path.queryString.includes("n")) {
-            if (data.n == 0) {
+            if (data.n <= 0) {
                 data.error = "'n' parameter must be an integer > 0";
                 this.HttpContext.response.JSON(data);
+            } else if (Object.keys(data).length > 2) {
+                data.error = "too many parameters";
+                return this.HttpContext.response.JSON(data);
             } else {
                 switch (data.op) {
                     case "!":
+                        data.n = parseInt(data.n);
                         data.value = factorializeNumber(data.n);
                         this.HttpContext.response.JSON(data);
                         break;
@@ -105,56 +94,34 @@ export default class MathsController extends Controller {
                         this.HttpContext.response.JSON(data);
                         break;
                     case "np":
+                        data.n = parseInt(data.n);
                         data.value = getPrimeNumberAtPos(data.n);
                         this.HttpContext.response.JSON(data);
                         break;
                 }
             }
         } else {
-            if (!this.HttpContext.path.queryString.includes("x")) {
+            if (this.HttpContext.path.queryString.includes("X")) {
                 data.error = "'x' parameter is missing";
                 return this.HttpContext.response.JSON(data);
-            } else if (!this.HttpContext.path.queryString.includes("y")) {
+            } else if (this.HttpContext.path.queryString.includes("Y")) {
                 data.error = "'y' parameter is missing";
                 return this.HttpContext.response.JSON(data);
-            } /*else if (!this.HttpContext.path.queryString.includes("x") && !this.HttpContext.path.queryString.includes("y") && !this.HttpContext.path.queryString.includes("n")) {
-                data.error = "this parameter does not exists";
-                return this.HttpContext.path.response.JSON(data);
-            }*/
-
+            } else if (data.op == undefined) {
+                data.error = "'op' parameter is missing";
+                return this.HttpContext.response.JSON(data);
+            }
         }
-        /*switch (data.op) {
-            default:
-                error = this.HttpContext.response.unprocessable("this operator does not exist");
-                if (!isNaN(y) && !isNaN(x) && isNaN(n)) {
-                    message = "{'op':" + op + ",'x':" + x + ", 'y':" + y + ",'error':" + error + "}";
-                } else if (!isNaN(n) && isNaN(x) && isNaN(y)) {
-                    message = "{'op':" + op + ",'n':" + n + ", 'error':" + error + "}";
-                }
-                this.HttpContext.response.JSON(message);
-                break;
-        }*/
     }
-
-    /*help() {
-        let helpPagePath = path.join(process.cwd(), wwwroot, "API-Help-Pages/API-Maths-Help.html");
-        this.HttpContext.response.HTML(fs.readFileSync(helpPagePath));
-    }
-
-    get() {
-        if (this.HttpContext.path.queryString == '?')
-            this.help();
-        else
-            this.doOperation();
-    }*/
 }
 
 function isPrime(n) {
-    if (n <= 1)
-        return false
-    for (var i = 2; i <= n - 1; i++)
-        if (n % i == 1)
-            return true;
+    for (var i = 2; i < n; i++) {
+        if (n % i === 0) {
+            return false;
+        }
+    }
+    return n > 1;
 }
 
 function getPrimeNumberAtPos(n) {
@@ -169,8 +136,12 @@ function getPrimeNumberAtPos(n) {
 }
 
 function factorializeNumber(n) {
-    if (n === 0 || n === 1) {
+    var result = n;
+    if (n === 0 || n === 1)
         return 1;
+    while (n > 1) {
+        n--;
+        result *= n;
     }
-    return n * factorializeNumber(n - 1);
+    return result;
 }

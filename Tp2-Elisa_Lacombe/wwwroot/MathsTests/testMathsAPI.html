@@ -182,10 +182,12 @@
             $(".container").append(status + " ---> " + JSON.stringify(result)).append($("<br>"));
         }
         function factorial(n) {
-            if (n === 0 || n === 1) {
+            if (n === 0 || n === 1)
                 return 1;
+            for (var i = n - 1; i >= 1; i--) {
+                n *= i;
             }
-            return n * factorial(n - 1);
+            return n;
         }
 
         function isPrime(value) {
