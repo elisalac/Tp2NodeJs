@@ -57,9 +57,9 @@ export default class MathsController extends Controller {
                     break;
                 case "/":
                     if (data.x == 0 && data.y == 0)
-                        data.error = "NaN";
+                        data.value = "NaN";
                     else if (data.y == 0)
-                        data.error = Infinity.toString();
+                        data.value = Infinity.toString();
                     else
                         data.value = data.x / data.y;
                     this.HttpContext.response.JSON(data);
@@ -68,7 +68,7 @@ export default class MathsController extends Controller {
                     if (data.x != 0 && data.y != 0)
                         data.value = data.x % data.y;
                     else
-                        data.error = "NaN"
+                        data.value = "NaN"
                     this.HttpContext.response.JSON(data);
                     break;
             }
